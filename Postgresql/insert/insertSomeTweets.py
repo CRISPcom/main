@@ -4,22 +4,6 @@ import json
 import random
 from sqlalchemy import Table, Column
 
-SQL = """INSERT INTO tweet VALUES (
-    {id},
-    '{text}',
-    {user_id},
-    '{user_name}',
-    '{location}',
-    {user_friends},
-    {user_followers_count},
-    {timestamp},
-    false,
-    {score},
-    '{topic}', 
-    '{telecom_compagny}');
-
-"""
-
 
 def connect(user, password, db, host='localhost', port=5432):
     '''Returns a connection and a metadata object'''
@@ -37,12 +21,17 @@ def connect(user, password, db, host='localhost', port=5432):
     return con, meta
 
 
+# connect to the database
 con, meta = connect('docker', 'docker', 'docker')
+# clear existing tables from the meta object
+command = "DROP TABLE IF EXISTS data;"
+con.execute(command)
+
 meta.clear()
 
 table = Table('data', meta,
               Column('id', sqlalchemy.BigInteger, primary_key=True),
-              Column('text', sqlalchemy.VARCHAR(280)),
+              Column('text', sqlalchemy.VARCHAR(281)),
               Column('user_id', sqlalchemy.BIGINT),
               Column('user_name', sqlalchemy.VARCHAR(100)),
               Column('location', sqlalchemy.VARCHAR(100)),
