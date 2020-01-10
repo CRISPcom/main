@@ -21,7 +21,6 @@ RUN apt-get update && apt-get install -y python-software-properties software-pro
 # after each ``apt-get``
 COPY create_table.sql /tmp/
 ENV PGPASSWORD=docker
-RUN echo $PGPASSWORD
 # Run the rest of the commands as the ``postgres`` user created by the ``postgres-9.3`` package when it was ``apt-get installed``
 USER postgres
 
