@@ -1,75 +1,81 @@
+import sqlalchemy
 import psycopg2
 import json
 import random
+from sqlalchemy import Table, Column
 
-
-SQL = """INSERT INTO tweets VALUES (
+SQL = """INSERT INTO tweet VALUES (
     {id},
-    {text},
+    '{text}',
     {user_id},
-    {user_name},
-    {location},
+    '{user_name}',
+    '{location}',
     {user_friends},
-    {user_followers_count}, 
+    {user_followers_count},
     {timestamp},
-    {is_tweet_reply},
+    false,
     {score},
-    {topic}, 
-    {telecom_compagny});
+    '{topic}', 
+    '{telecom_compagny}');
 
 """
 
 
-def getRequests():
-    requetes = []
-    with open('./Postgresql/insert/tweets.json') as f:
-        data = json.load(f)
+def connect(user, password, db, host='localhost', port=5432):
+    '''Returns a connection and a metadata object'''
+    # We connect with the help of the PostgreSQL URL
+    # postgresql://federer:grandestslam@localhost:5432/tennis
+    url = 'postgresql://{}:{}@{}:{}/{}'
+    url = url.format(user, password, host, port, db)
 
-        for tweet in data:
+    # The return value of create_engine() is our connection object
+    con = sqlalchemy.create_engine(url, client_encoding='utf8')
 
-            requete = SQL.format(
-                id=tweet["id"],
-                text=tweet["text"],
-                user_id=tweet["user"]["id"],
-                user_name=tweet["user"]["screen_name"],
-                location=tweet["user"]["location"],
-                user_friends=tweet["user"]["friends_count"],
-                user_followers_count=tweet["user"]["followers_count"],
-                timestamp=tweet["created_at"],
-                is_tweet_reply=tweet["in_reply_to_status_id"] != None,
-                score=random.uniform(0, 1),
-                topic="box" if random.uniform(0, 1) > 0.5 else "mobile",
-                telecom_compagny="verizon" if random.uniform(0, 1) > 0.5 else "ATT"
-            )
-            print(requete)
-            requetes.append(requete)
-    return requetes
+    # We then bind the connection to MetaData()
+    meta = sqlalchemy.MetaData(bind=con, reflect=True)
+
+    return con, meta
 
 
-reqs = getRequests()
+con, meta = connect('docker', 'docker', 'docker')
+meta.clear()
 
-try:
+table = Table('data', meta,
+              Column('id', sqlalchemy.BigInteger, primary_key=True),
+              Column('text', sqlalchemy.VARCHAR(280)),
+              Column('user_id', sqlalchemy.BIGINT),
+              Column('user_name', sqlalchemy.VARCHAR(100)),
+              Column('location', sqlalchemy.VARCHAR(100)),
+              Column('user_friends_count', sqlalchemy.INT),
+              Column('user_followers_count', sqlalchemy.INT),
+              Column('timestamp', sqlalchemy.TIMESTAMP),
+              Column('is_tweet_reply', sqlalchemy.BOOLEAN),
+              Column('score', sqlalchemy.FLOAT(10)),
+              Column('topic', sqlalchemy.VARCHAR(50)),
+              Column('telecom_company', sqlalchemy.VARCHAR(50))
+              )
 
-    connection = psycopg2.connect(user="docker",
-                                  password="docker",
-                                  host="127.0.0.1",
-                                  port="5432",
-                                  database="docker")
+meta.create_all(con, checkfirst=True)
 
-    cursor = connection.cursor()
-    # Print PostgreSQL Connection properties
-    print(connection.get_dsn_parameters(), "\n")
+with open('tweets.json') as f:
+    data = json.load(f)
+    print(data[0]["text"])
 
-    # Print PostgreSQL version
-    cursor.execute("SELECT version();")
-    record = cursor.fetchone()
-    print("You are connected to - ", record, "\n")
+    for tweet in data:
 
-except (Exception, psycopg2.Error) as error:
-    print("Error while connecting to PostgreSQL", error)
-finally:
-    #closing database connection.
-        if(connection):
-            cursor.close()
-            connection.close()
-            print("PostgreSQL connection is closed")
+        clause = table.insert().values(
+            id=tweet["id"],
+            text=tweet["text"],
+            user_id=tweet["user"]["id"],
+            user_name=tweet["user"]["screen_name"],
+            location=tweet["user"]["location"],
+            user_friends_count=tweet["user"]["friends_count"],
+            user_followers_count=tweet["user"]["followers_count"],
+            timestamp=tweet["created_at"],
+            is_tweet_reply=tweet["in_reply_to_status_id"] != None,
+            score=random.uniform(0, 1),
+            topic="box" if random.uniform(0, 1) > 0.5 else "mobile",
+            telecom_company="verizon" if random.uniform(
+                0, 1) > 0.5 else "ATT"
+        )
+        con.execute(clause)
