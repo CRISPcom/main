@@ -16,7 +16,7 @@ services:
     hostname: kafka
     environment:
       KAFKA_CREATE_TOPICS: "UploadFile:1:1,GetFile:1:1,TrackUpload:1:1,GetEmailContent:1:1" # topic:partition:replicas
-      KAFKA_ADVERTISED_HOST_NAME: 172.18.0.3 # docker-machine ip
+      KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1 # docker-machine ip
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_PORT: 9092
     depends_on:
