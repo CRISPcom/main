@@ -27,7 +27,6 @@ class TwitterClient(tw.StreamListener):
   producer = KafkaProducer(
             bootstrap_servers=os.getenv("KAFKA_BROKER", "127.0.0.1:9092"),
             value_serializer=lambda v: json.dumps(v).encode('utf-8'),
-            key_serializer=str.encode,
             acks="all",
             retries=2,
         )
@@ -51,9 +50,8 @@ class TwitterClient(tw.StreamListener):
         #         self.topic = trac
         self.producer.send(
             self.topic, 
-            value=json.dumps(status._json),
-            key=bytes(status._json["id_str"], 'utf-8')
-        ).add_callback(lambda x: sys.stdout.write(str(x) + "\n"))
+            value=status._json,
+        )
 
     except StopIteration as e:
         self.producer.close()
