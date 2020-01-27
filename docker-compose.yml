@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   zookeeper:
     image: wurstmeister/zookeeper
@@ -20,10 +20,39 @@ services:
     depends_on:
     - "zookeeper"
 
-    
   postgres:
     build: ./Postgresql
     ports:
       - "${docker_postgres_port}:5432"
 
+  twitter_consumer:
+    build: 
+      context: ./twitter/consumer
+      args: 
+        - kafka_twitter_topic=${kafka_twitter_topic}
+        - docker_kafka_adress=${docker_kafka_adress}
+        - docker_kafka_port=${docker_kafka_port}
+        - docker_postgres_port=${docker_postgres_port}
+    command : python Consumer.py
+    env_file: .env
+    depends_on: 
+      - kafka
+
+  twitter_producer:
+    build: 
+      context: ./twitter/producer
+      args: 
+        - kafka_twitter_topic=${kafka_twitter_topic}
+        - docker_kafka_adress=${docker_kafka_adress}
+        - docker_kafka_port=${docker_kafka_port}
+        - docker_postgres_port=${docker_postgres_port}
+        - twitter_consumer_key=${twitter_consumer_key}
+        - twitter_consumer_secret=${twitter_consumer_secret}
+        - twitter_access_token=${twitter_access_token}
+        - twitter_access_token_secret=${twitter_access_token_secret}
+    command : python Producer.py
+    env_file: .env
+    depends_on: 
+      - kafka
+    
 

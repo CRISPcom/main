@@ -1,0 +1,14 @@
+
+FROM python:3.6-alpine
+
+
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt
+COPY Consumer.py Consumer.py
+ARG kafka_twitter_topic=${kafka_twitter_topic}
+ARG docker_kafka_adress=kafka
+ARG docker_kafka_port=${docker_kafka_port}
+ARG docker_postgres_port=${docker_postgres_port}
+RUN echo $kafka_twitter_topic
+
+
