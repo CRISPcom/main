@@ -1,5 +1,6 @@
 #!/usr/bin/python3.6
 
+import nltk
 from nltk.sentiment.vader import SentimentIntensityAnalyzer as sia
 import logging
 import time
@@ -15,36 +16,39 @@ from kafka import KafkaProducer
 from kafka.errors import KafkaError
 import logging
 logging.basicConfig(filename="error.log", level=logging.INFO)
-import nltk
 nltk.download('vader_lexicon')
 
-
+# Set tweeter auth credentials (from the .env file)
 consumer_key = os.environ['twitter_consumer_key']
 consumer_secret = os.environ['twitter_consumer_secret']
 access_token = os.environ['twitter_access_token']
 access_token_secret = os.environ['twitter_access_token_secret']
+
 topic = os.environ['kafka_twitter_topic']
 kafka_port = os.environ["docker_kafka_port"]
 kafka_adress = os.environ["docker_kafka_adress"]
 
-TARGET = ["AT&T", "Verizon", "Vodafone", "Comcast"]
+TARGET = os.environ["twitter_feed_channel"].split(",")
+logging.info(f"listening to {TARGET}")
 
 class TwitterClient(tw.StreamListener):
     """ A listener handles tweets that are received from the stream."""
 
     topic = topic
     track = TARGET
-    # producer = producer
 
     def on_status(self, status):
-
+        """
+        When the client receives a tweet
+            :param status:  the tweet status
+        """
         try:
             if "extended_tweet" in status._json and "full_text" in status._json["extended_tweet"]:
                 status._json["text"] = status._json["extended_tweet"]["full_text"]
             text = status._json["text"]
             ps = sia().polarity_scores(text)
             score = ps["compound"]
-            logging.info(f"tweet : {score}" )
+            logging.info(f"tweet : {score}")
             status._json['score'] = score
 
             self.producer.send(
@@ -57,13 +61,17 @@ class TwitterClient(tw.StreamListener):
             running = False
 
     def on_error(self, status):
-        print(status)
+        """
+        docstring here
+            :param self:
+            :param status:
+        """
+        logging.error(status)
 
 
-logging.info(f"Baptou le meuilleur {consumer_key}" )
 
 if __name__ == '__main__':
-
+    # We try to connect 15 times before shutting down
     for i in range(15):
         try:
             producer = KafkaProducer(
@@ -75,12 +83,10 @@ if __name__ == '__main__':
             i = 15
         except:
             time.sleep(2)
-            print("Cannot connect to Kafka. Retrying in 2 seconds")
+            logging.warn("Cannot connect to Kafka. Retrying in 2 seconds")
 
-    logging.info(type(producer))
     auth = OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
-    logging.info(access_token)
     api = tw.API(auth, wait_on_rate_limit=True)
     myStreamListener = TwitterClient()
     myStreamListener.producer=producer

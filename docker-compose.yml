@@ -50,6 +50,7 @@ services:
         - twitter_consumer_secret=${twitter_consumer_secret}
         - twitter_access_token=${twitter_access_token}
         - twitter_access_token_secret=${twitter_access_token_secret}
+        - twitter_feed_channel=${twitter_feed_channel}
     command : python Producer.py
     env_file: .env
     depends_on: 

@@ -3,12 +3,12 @@ from json import loads
 import os
 import time
 import logging
+
 logging.basicConfig(filename="error.log", level=logging.INFO)
 
 kafka_twitter_topic=os.environ["kafka_twitter_topic"]
 docker_kafka_port=os.environ["docker_kafka_port"]
 docker_kafka_adress=os.environ["docker_kafka_adress"]
-logging.info("je suis là")
 for i in range(15):
     try:
         consumer = KafkaConsumer(
@@ -23,9 +23,9 @@ for i in range(15):
     except:
         # Wait for kafka to be up
         time.sleep(2)
-        print("Cannot connect to Kafka. Retrying in 2 seconds")
+        logging.warn("Cannot connect to Kafka. Retrying in 2 seconds")
 
-logging.info("Je lis les messages")
+
 for message in consumer:
     if "text" in message.value:
-        logging.info(message.value["text"])
+        logging.info(f"received message : {message.value['text']}")
