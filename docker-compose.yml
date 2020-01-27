@@ -3,20 +3,20 @@ services:
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
-    - "2181:2181"
+    - "${docker_zookeeper_port}:2181"
     hostname: zookeeper
 
   kafka:
     image: wurstmeister/kafka:2.12-2.2.0
     command: [start-kafka.sh]
     ports:
-    - "9092:9092"
+    - "${docker_kafka_port}:9092"
     hostname: kafka
     environment:
-      KAFKA_CREATE_TOPICS: "UploadFile:1:1,GetFile:1:1,TrackUpload:1:1,GetEmailContent:1:1" # topic:partition:replicas
-      KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1 # docker-machine ip
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_CREATE_TOPICS: ${docker_kafka_topics} # topic:partition:replicas
+      KAFKA_ADVERTISED_HOST_NAME: ${docker_kafka_adress} # docker-machine ip
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:${docker_zookeeper_port}
+      KAFKA_ADVERTISED_PORT: ${docker_kafka_port}
     depends_on:
     - "zookeeper"
 
@@ -24,6 +24,6 @@ services:
   postgres:
     build: ./Postgresql
     ports:
-      - "5432:5432"
+      - "${docker_postgres_port}:5432"
 
 
