@@ -5,6 +5,9 @@ services:
     ports:
     - "${docker_zookeeper_port}:2181"
     hostname: zookeeper
+    networks:
+      main:
+        ipv4_address: 172.20.0.6
 
   kafka:
     image: wurstmeister/kafka:2.12-2.2.0
@@ -19,11 +22,18 @@ services:
       KAFKA_ADVERTISED_PORT: ${docker_kafka_port}
     depends_on:
     - "zookeeper"
+    networks:
+      main:
+        ipv4_address: 172.20.0.2
 
   postgres:
     build: ./Postgresql
     ports:
       - "${docker_postgres_port}:5432"
+    networks:
+      main:
+        ipv4_address: 172.20.0.3
+    env_file: .env
 
   twitter_consumer:
     build: 
@@ -37,6 +47,9 @@ services:
     env_file: .env
     depends_on: 
       - kafka
+    networks:
+      main:
+        ipv4_address: 172.20.0.4
 
   twitter_producer:
     build: 
@@ -55,5 +68,13 @@ services:
     env_file: .env
     depends_on: 
       - kafka
+    networks:
+      main:
+        ipv4_address: 172.20.0.5
     
+networks:
+  main:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
 

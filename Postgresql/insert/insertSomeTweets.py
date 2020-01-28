@@ -3,8 +3,6 @@ import psycopg2
 import json
 import random
 from sqlalchemy import Table, Column
-import os
-
 
 def connect(user, password, db, host='localhost', port=5432):
     '''Returns a connection and a metadata object'''

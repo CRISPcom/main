@@ -35,7 +35,6 @@ class TwitterClient(tw.StreamListener):
     """ A listener handles tweets that are received from the stream."""
 
     topic = topic
-    track = TARGET
 
     def on_status(self, status):
         """
