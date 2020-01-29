@@ -4,7 +4,6 @@ import json
 import random
 from sqlalchemy import Table, Column
 
-
 def connect(user, password, db, host='localhost', port=5432):
     '''Returns a connection and a metadata object'''
     # We connect with the help of the PostgreSQL URL
@@ -62,9 +61,8 @@ with open('tweets.json') as f:
             user_followers_count=tweet["user"]["followers_count"],
             timestamp=tweet["created_at"],
             is_tweet_reply=tweet["in_reply_to_status_id"] != None,
-            score=random.uniform(0, 1),
+            score=tweet["score"],
             topic="box" if random.uniform(0, 1) > 0.5 else "mobile",
-            telecom_company="verizon" if random.uniform(
-                0, 1) > 0.5 else "ATT"
+            telecom_company=tweet["company"]
         )
         con.execute(clause)

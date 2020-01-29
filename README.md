@@ -11,14 +11,23 @@ It provides 2 dashboards :
 * Docker and docker-compose
 * PostgreSQL, Kafka
 * Tableau, Grafana
-* nltk NLP models with VADER lexicon
+* [nltk](https://www.nltk.org/)  with [VADER](http://www.nltk.org/_modules/nltk/sentiment/vader.html) lexicon
 
 ## Getting started
-### Limitations
-This project only works only works on Linux OS for now.
+
+### Requirements
+* [docker](https://www.docker.com/)
+* [docker compose](https://docs.docker.com/compose/)
+* This project has only been tested on linux/unix OS.
 
 ### Launch
 1. Clone the repository : git clone https://github.com/CRISPcom/main.git
 2. Go to cloned folder `cd main`
-3. Install dependencies : `pip install -r requirements.txt`
-4. Launch projet  : `source start.sh`
+3. Configure keys in the `.env` file (Most importantly twitter API keys)
+3. Launch projet  : `docker-compose up`
+4. Enjoy rour real time dashboard (TODO)
+
+## TODO
+- [] Add documentation
+- [] Add dashboarding (real time and consolidated)
+- [] Filter tweets

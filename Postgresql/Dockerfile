@@ -4,6 +4,13 @@
 
 FROM ubuntu:16.04
 
+ARG docker_postgres_port=${docker_postgres_port}
+ARG docker_postgres_user=${docker_postgres_user}
+ARG docker_postgres_password=${docker_postgres_password}
+ARG docker_postgres_db=${docker_postgres_db}
+ARG docker_postgres_table=${docker_postgres_table}
+ARG docker_postgres_hostname=${docker_postgres_hostname}
+
 # Add the PostgreSQL PGP key to verify their Debian packages.
 # It should be the same key as https://www.postgresql.org/media/keys/ACCC4CF8.asc
 RUN apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8

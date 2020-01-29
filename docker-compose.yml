@@ -1,10 +1,13 @@
-version: '3'
+version: "3"
 services:
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
     - "${docker_zookeeper_port}:2181"
     hostname: zookeeper
+    networks:
+      main:
+        ipv4_address: 172.20.0.6
 
   kafka:
     image: wurstmeister/kafka:2.12-2.2.0
@@ -19,11 +22,59 @@ services:
       KAFKA_ADVERTISED_PORT: ${docker_kafka_port}
     depends_on:
     - "zookeeper"
+    networks:
+      main:
+        ipv4_address: 172.20.0.2
 
-    
   postgres:
     build: ./Postgresql
     ports:
       - "${docker_postgres_port}:5432"
+    networks:
+      main:
+        ipv4_address: 172.20.0.3
+    env_file: .env
 
+  twitter_consumer:
+    build: 
+      context: ./twitter/consumer
+      args: 
+        - kafka_twitter_topic=${kafka_twitter_topic}
+        - docker_kafka_adress=${docker_kafka_adress}
+        - docker_kafka_port=${docker_kafka_port}
+        - docker_postgres_port=${docker_postgres_port}
+    command : python Consumer.py
+    env_file: .env
+    depends_on: 
+      - kafka
+    networks:
+      main:
+        ipv4_address: 172.20.0.4
+
+  twitter_producer:
+    build: 
+      context: ./twitter/producer
+      args: 
+        - kafka_twitter_topic=${kafka_twitter_topic}
+        - docker_kafka_adress=${docker_kafka_adress}
+        - docker_kafka_port=${docker_kafka_port}
+        - docker_postgres_port=${docker_postgres_port}
+        - twitter_consumer_key=${twitter_consumer_key}
+        - twitter_consumer_secret=${twitter_consumer_secret}
+        - twitter_access_token=${twitter_access_token}
+        - twitter_access_token_secret=${twitter_access_token_secret}
+        - twitter_feed_channel=${twitter_feed_channel}
+    command : python Producer.py
+    env_file: .env
+    depends_on: 
+      - kafka
+    networks:
+      main:
+        ipv4_address: 172.20.0.5
+    
+networks:
+  main:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
 
