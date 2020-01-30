@@ -49,7 +49,6 @@ services:
       - kafka
     networks:
       main:
-        ipv4_address: 172.20.0.4
 
   twitter_producer:
     build: 
