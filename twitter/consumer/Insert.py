@@ -38,6 +38,7 @@ def getTable(meta):
           Column('telecom_company', sqlalchemy.VARCHAR(50)),
           Column('lat', sqlalchemy.FLOAT(12)),
           Column('lon', sqlalchemy.FLOAT(12)),
+          Column('hashtag', sqlalchemy.VARCHAR(50)),
           extend_existing=True
           )
 
@@ -104,5 +105,6 @@ def insertTweet(con, table, tweet):
                 0, 1) > 0.5 else "ATT",
             lat=locationDict["lat"],
             lon=locationDict["lon"],
+            hashtag=tweet["entities"]["hashtags"]["text"]
         )
     con.execute(clause)
