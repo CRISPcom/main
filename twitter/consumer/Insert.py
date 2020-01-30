@@ -104,6 +104,6 @@ def insertTweet(con, table, tweet):
             telecom_company= tweet["company"],
             lat=locationDict["lat"],
             lon=locationDict["lon"],
-            hashtag=tweet["entities"]["hashtags"]["text"]
+            hashtag=tweet["entities"]["hashtags"]["text"],
         )
     con.execute(clause)
