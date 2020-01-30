@@ -30,13 +30,14 @@ kafka_adress = os.environ["docker_kafka_adress"]
 
 TARGET = os.environ["twitter_feed_channel"].split(",")
 logging.info(f"listening to {TARGET}")
-company_username = os.environ["twitter_filter_channel"]
+company_username = os.environ["twitter_filter_channel"].split(",")
 
 class TwitterClient(tw.StreamListener):
     """ A listener handles tweets that are received from the stream."""
 
     topic = topic
     company_username = company_username
+    dict_username = {"ATT":"AT&T","ATTHelp":"AT&T","ATTTHANKS":"AT&T","Verizon":"Verizon","VZWSupport":"Verizon","TMobile":"T-Mobile","TMobileHelp":"T-Mobile","VodafoneIT":"Vodafone"}
     producer=None
 
     def on_status(self, status):
@@ -54,9 +55,14 @@ class TwitterClient(tw.StreamListener):
                 logging.info(f"tweet : {score}")
                 status._json['score'] = score
 
-                for company in TARGET :
-                    if company in status._json["text"]:
-                        status._json["company"]=company
+                # Finding the company the tweet is about
+                status._json["company"] = "Unknown"
+                if status._json["entities"]["user_mentions"] in company_username :
+                    status._json["company"] = dict_username[status._json["entities"]["user_mentions"]]
+                else : 
+                    for company in TARGET :
+                        if company in text :
+                            status._json["company"] = company
 
                 self.producer.send(
                     self.topic,
