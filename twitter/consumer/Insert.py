@@ -5,6 +5,7 @@ import random
 from sqlalchemy import Table, Column
 import os
 import logging
+import Geocode
 
 logging.basicConfig(filename="error.log", level=logging.INFO)
 
@@ -84,12 +85,13 @@ def insertTweet(con, table, tweet):
         :param table: the table 
         :param tweet: the tweet
     """
+    locationDict = Geocode.geocode(tweet)
     clause = table.insert().values(
             # id=tweet["id"],
             text=tweet["text"],
             user_id=tweet["user"]["id"],
             user_name=tweet["user"]["screen_name"],
-            location=tweet["user"]["location"],
+            location=locationDict["country"],
             user_friends_count=tweet["user"]["friends_count"],
             user_followers_count=tweet["user"]["followers_count"],
             timestamp=tweet["created_at"],

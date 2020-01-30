@@ -71,6 +71,19 @@ services:
     networks:
       main:
         ipv4_address: 172.20.0.5
+
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - ./grafana:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on: 
+      - postgres
+    networks:
+      main:
+        ipv4_address: 172.20.0.10
+    user: "0"
     
 networks:
   main:

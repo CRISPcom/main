@@ -10,6 +10,7 @@ RUN pip install -r requirements.txt
 # Copy code
 COPY Consumer.py Consumer.py
 COPY Insert.py Insert.py
+COPY Geocode.py Geocode.py
 
 # Set environment variables
 ARG kafka_twitter_topic=${kafka_twitter_topic}

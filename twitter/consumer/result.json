@@ -1,0 +1,65 @@
+{
+    "accuracy": 0.3,
+    "address": "Via San Fransico, Rio Rico, Santa Cruz County, Arizona, 85648, United States of America",
+    "allotments": "Rio Rico",
+    "bbox": {
+        "northeast": [
+            31.4798395,
+            -110.9343644
+        ],
+        "southwest": [
+            31.4641216,
+            -110.9526615
+        ]
+    },
+    "confidence": 7,
+    "country": "United States of America",
+    "country_code": "us",
+    "county": "Santa Cruz County",
+    "farm": "Rio Rico",
+    "hamlet": "Rio Rico",
+    "importance": 0.3,
+    "isolated_dwelling": "Rio Rico",
+    "lat": 31.4734232,
+    "lng": -110.9451805,
+    "ok": True,
+    "osm_id": 16947363,
+    "osm_type": "way",
+    "place_id": 88521158,
+    "place_rank": 26,
+    "postal": "85648",
+    "quality": "residential",
+    "raw": {
+        "place_id": 88521158,
+        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
+        "osm_type": "way",
+        "osm_id": 16947363,
+        "boundingbox": [
+            "31.4641216",
+            "31.4798395",
+            "-110.9526615",
+            "-110.9343644"
+        ],
+        "lat": "31.4734232",
+        "lon": "-110.9451805",
+        "display_name": "Via San Fransico, Rio Rico, Santa Cruz County, Arizona, 85648, United States of America",
+        "place_rank": 26,
+        "category": "highway",
+        "type": "residential",
+        "importance": 0.3,
+        "address": {
+            "road": "Via San Fransico",
+            "hamlet": "Rio Rico",
+            "county": "Santa Cruz County",
+            "state": "Arizona",
+            "postcode": "85648",
+            "country": "United States of America",
+            "country_code": "us"
+        }
+    },
+    "region": "Arizona",
+    "state": "Arizona",
+    "status": "OK",
+    "street": "Via San Fransico",
+    "type": "residential"
+}
