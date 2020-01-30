@@ -13,6 +13,9 @@ import time
 import logging
 from nltk.sentiment.vader import SentimentIntensityAnalyzer as sia
 import nltk
+import logging
+logging.basicConfig(filename="error.log", level=logging.INFO)
+
 nltk.download('vader_lexicon')
 
 # Set tweeter auth credentials (from the .env file)
@@ -34,6 +37,7 @@ class TwitterClient(tw.StreamListener):
 
     topic = topic
     company_username = company_username
+    producer=None
 
     def on_status(self, status):
         """
@@ -90,6 +94,7 @@ if __name__ == '__main__':
     auth.set_access_token(access_token, access_token_secret)
     api = tw.API(auth, wait_on_rate_limit=True)
     myStreamListener = TwitterClient()
+    myStreamListener.producer=producer
     stream = tw.Stream(auth=api.auth, listener=myStreamListener)
     stream.filter(track=TARGET, languages=["en"])
 

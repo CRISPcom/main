@@ -36,6 +36,8 @@ def getTable(meta):
           Column('score', sqlalchemy.FLOAT(10)),
           Column('topic', sqlalchemy.VARCHAR(50)),
           Column('telecom_company', sqlalchemy.VARCHAR(50)),
+          Column('lat', sqlalchemy.FLOAT(12)),
+          Column('lon', sqlalchemy.FLOAT(12)),
           extend_existing=True
           )
 
@@ -99,6 +101,8 @@ def insertTweet(con, table, tweet):
             score=tweet["score"],
             topic="box" if random.uniform(0, 1) > 0.5 else "mobile",
             telecom_company="verizon" if random.uniform(
-                0, 1) > 0.5 else "ATT"
+                0, 1) > 0.5 else "ATT",
+            lat=locationDict["lat"],
+            lon=locationDict["lon"],
         )
     con.execute(clause)

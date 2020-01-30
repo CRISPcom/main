@@ -17,5 +17,6 @@ ARG twitter_consumer_key=${twitter_consumer_key}
 ARG twitter_consumer_secret=${twitter_consumer_secret}
 ARG twitter_access_token=${twitter_access_token}
 ARG twitter_access_token_secret=${twitter_access_token_secret}
+ARG twitter_filter_channel=${twitter_filter_channel}
 
 ARG twitter_feed_channel=${twitter_feed_channel}

@@ -64,6 +64,7 @@ services:
         - twitter_access_token=${twitter_access_token}
         - twitter_access_token_secret=${twitter_access_token_secret}
         - twitter_feed_channel=${twitter_feed_channel}
+        - twitter_filter_channel=${twitter_filter_channel}
     command : python Producer.py
     env_file: .env
     depends_on: 
