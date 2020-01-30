@@ -1,21 +1,18 @@
 #!/usr/bin/python3.6
 
-import nltk
-from nltk.sentiment.vader import SentimentIntensityAnalyzer as sia
-import logging
-import time
-import sys
-import json
-import os
-import codecs
-from tweepy import OAuthHandler
-from tweepy import Stream
-import tweepy as tw
-from kafka import KafkaProducer
-from kafka import KafkaProducer
 from kafka.errors import KafkaError
+from kafka import KafkaProducer
+import tweepy as tw
+from tweepy import Stream
+from tweepy import OAuthHandler
+import codecs
+import os
+import json
+import sys
+import time
 import logging
-logging.basicConfig(filename="error.log", level=logging.INFO)
+from nltk.sentiment.vader import SentimentIntensityAnalyzer as sia
+import nltk
 nltk.download('vader_lexicon')
 
 # Set tweeter auth credentials (from the .env file)
@@ -30,11 +27,13 @@ kafka_adress = os.environ["docker_kafka_adress"]
 
 TARGET = os.environ["twitter_feed_channel"].split(",")
 logging.info(f"listening to {TARGET}")
+company_username = os.environ["twitter_filter_channel"]
 
 class TwitterClient(tw.StreamListener):
     """ A listener handles tweets that are received from the stream."""
 
     topic = topic
+    company_username = company_username
 
     def on_status(self, status):
         """
@@ -42,18 +41,23 @@ class TwitterClient(tw.StreamListener):
             :param status:  the tweet status
         """
         try:
-            if "extended_tweet" in status._json and "full_text" in status._json["extended_tweet"]:
-                status._json["text"] = status._json["extended_tweet"]["full_text"]
-            text = status._json["text"]
-            ps = sia().polarity_scores(text)
-            score = ps["compound"]
-            logging.info(f"tweet : {score}")
-            status._json['score'] = score
+            if status._json["user"]["name"] not in company_username :
+                if "extended_tweet" in status._json and "full_text" in status._json["extended_tweet"]:
+                    status._json["text"] = status._json["extended_tweet"]["full_text"]
+                text = status._json["text"]
+                ps = sia().polarity_scores(text)
+                score = ps["compound"]
+                logging.info(f"tweet : {score}")
+                status._json['score'] = score
 
-            self.producer.send(
-                self.topic,
-                value=status._json,
-            )
+                for company in TARGET :
+                    if company in status._json["text"]:
+                        status._json["company"]=company
+
+                self.producer.send(
+                    self.topic,
+                    value=status._json,
+                )
 
         except StopIteration as e:
             self.producer.close()
@@ -61,13 +65,11 @@ class TwitterClient(tw.StreamListener):
 
     def on_error(self, status):
         """
-        docstring here
-            :param self:
-            :param status:
-        """
+            docstring here
+                :param self:
+                :param status:
+            """
         logging.error(status)
-
-
 
 if __name__ == '__main__':
     # We try to connect 15 times before shutting down
@@ -88,6 +90,6 @@ if __name__ == '__main__':
     auth.set_access_token(access_token, access_token_secret)
     api = tw.API(auth, wait_on_rate_limit=True)
     myStreamListener = TwitterClient()
-    myStreamListener.producer=producer
     stream = tw.Stream(auth=api.auth, listener=myStreamListener)
     stream.filter(track=TARGET, languages=["en"])
+
